@@ -1,0 +1,1380 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Куда поедем?</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8C%B8%3C/text%3E%3C/svg%3E"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Great+Vibes&family=Jost:wght@300;400;500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #fdf6f3;
+        --paper: #fffdfb;
+        --ink: #4a3b3b;
+        --muted: #9a8887;
+        --rose: #e8a9b4;
+        --rose-deep: #d98497;
+        --rose-soft: #f9e3e6;
+        --peach: #f6d6c2;
+        --line: #ecd9d6;
+        --shadow: 0 10px 30px rgba(217, 132, 151, 0.12);
+        --serif: "Cormorant Garamond", Georgia, serif;
+        --script: "Great Vibes", cursive;
+        --sans: "Jost", system-ui, sans-serif;
+        --gap: 10px;
+        --max: 2;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: var(--sans);
+        font-weight: 300;
+        color: var(--ink);
+        background:
+          radial-gradient(circle at 8% 0%, #fde9ea 0, transparent 40%),
+          radial-gradient(circle at 95% 25%, #eef4e9 0, transparent 35%),
+          var(--bg);
+        min-height: 100vh;
+        padding: 0 14px 40px;
+        overflow-x: hidden;
+      }
+
+      .petals {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 0;
+        overflow: hidden;
+      }
+
+      .petal {
+        position: absolute;
+        top: -30px;
+        font-size: 18px;
+        line-height: 1;
+        opacity: 0.4;
+        animation: fall linear infinite;
+      }
+
+      @keyframes fall {
+        to {
+          transform: translate3d(var(--drift), 110vh, 0) rotate(540deg);
+        }
+      }
+
+      .hero {
+        position: relative;
+        z-index: 1;
+        text-align: center;
+        padding: 28px 0 12px;
+        animation: rise 0.9s ease both;
+      }
+      .hero .eyebrow {
+        font-size: 12px;
+        letter-spacing: 0.35em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+      .hero .flower {
+        font-size: 26px;
+        margin-top: 4px;
+        display: inline-block;
+        animation: sway 4s ease-in-out infinite;
+      }
+      @keyframes sway {
+        0%,
+        100% {
+          transform: rotate(-8deg);
+        }
+        50% {
+          transform: rotate(8deg);
+        }
+      }
+      .hero h1 {
+        font-family: var(--script);
+        font-weight: 400;
+        font-size: clamp(48px, 11vw, 80px);
+        color: var(--rose-deep);
+        line-height: 1.1;
+        margin-top: 6px;
+      }
+
+      @keyframes rise {
+        from {
+          opacity: 0;
+          transform: translateY(18px);
+        }
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+
+      .sheet {
+        position: relative;
+        z-index: 1;
+        max-width: 760px;
+        margin: 0 auto;
+        background: var(--paper);
+        border: 1px solid var(--line);
+        border-radius: 28px;
+        box-shadow: var(--shadow);
+        padding: 20px 12px 18px;
+        animation: rise 1s 0.15s ease both;
+      }
+
+      .sheet::before {
+        content: "";
+        position: absolute;
+        inset: 8px;
+        border: 1px dashed var(--line);
+        border-radius: 21px;
+        pointer-events: none;
+      }
+
+      .steps {
+        position: relative;
+        display: flex;
+        gap: 6px;
+        overflow-x: auto;
+        scrollbar-width: none;
+        padding-bottom: 4px;
+      }
+      .steps::-webkit-scrollbar {
+        display: none;
+      }
+
+      .step {
+        flex: 1 0 auto;
+        font: inherit;
+        font-size: 12px;
+        color: var(--muted);
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 6px 6px 10px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        position: relative;
+        transition: color 0.3s;
+      }
+
+      .step .s-ico {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        font-size: 18px;
+        background: var(--bg);
+        border: 1px solid var(--line);
+        position: relative;
+        transition:
+          transform 0.3s,
+          background 0.3s,
+          border-color 0.3s;
+      }
+
+      .step:hover .s-ico {
+        transform: translateY(-2px);
+      }
+      .step.active {
+        color: var(--rose-deep);
+      }
+      .step.active .s-ico {
+        background: var(--rose-soft);
+        border-color: var(--rose);
+        transform: scale(1.08);
+      }
+
+      .step .s-count {
+        position: absolute;
+        top: -4px;
+        right: -4px;
+        min-width: 18px;
+        height: 18px;
+        padding: 0 5px;
+        border-radius: 9px;
+        background: var(--rose-deep);
+        color: #fff;
+        font-size: 11px;
+        line-height: 18px;
+        text-align: center;
+        transform: scale(0);
+        transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.3, 1.5);
+      }
+
+      .step.has .s-count {
+        transform: scale(1);
+      }
+
+      .step::after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 30%;
+        right: 30%;
+        height: 2px;
+        border-radius: 2px;
+        background: var(--rose);
+        transform: scaleX(0);
+        transition: transform 0.35s;
+      }
+
+      .step.active::after {
+        transform: scaleX(1);
+      }
+
+      .head {
+        position: relative;
+        text-align: center;
+        padding: 12px 0 2px;
+      }
+      .head h2 {
+        font-family: var(--script);
+        font-weight: 400;
+        font-size: 34px;
+        color: var(--rose-deep);
+        line-height: 1.1;
+      }
+      .head p {
+        font-family: var(--serif);
+        font-style: italic;
+        font-size: 20px;
+        color: var(--muted);
+      }
+
+      .groups {
+        position: relative;
+        display: flex;
+        gap: 8px;
+        justify-content: center;
+        flex-wrap: wrap;
+        padding: 16px 4px 6px;
+      }
+      .groups.single-group {
+        display: none;
+      }
+
+      .chip {
+        flex: none;
+        font: inherit;
+        font-size: 14px;
+        color: var(--ink);
+        background: var(--paper);
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 0 16px;
+        min-height: 40px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition:
+          transform 0.25s,
+          background 0.25s,
+          border-color 0.25s,
+          box-shadow 0.25s;
+      }
+
+      .chip:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow);
+      }
+      .chip.active {
+        background: var(--rose-soft);
+        border-color: var(--rose);
+        color: var(--rose-deep);
+      }
+      .chip .dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--rose-deep);
+        transform: scale(0);
+        transition: transform 0.3s;
+      }
+      .chip.has .dot {
+        transform: scale(1);
+      }
+
+      .stage {
+        position: relative;
+        min-height: 200px;
+        overflow: hidden;
+        padding: 10px 0;
+      }
+
+      .panel {
+        opacity: 1;
+        transform: none;
+      }
+      .panel.out {
+        opacity: 0;
+        transform: translateX(var(--dx));
+        transition:
+          opacity 0.18s,
+          transform 0.18s;
+      }
+      .panel.enter {
+        animation: enter 0.4s ease both;
+      }
+
+      @keyframes enter {
+        from {
+          opacity: 0;
+          transform: translateX(var(--ex));
+        }
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+
+      .tiles {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: var(--gap);
+        padding: 6px 4px;
+      }
+
+      .tile {
+        --cols: min(var(--n), var(--max), var(--cap, 99));
+        flex: 0 0 calc((100% - (var(--cols) - 1) * var(--gap)) / var(--cols));
+        min-width: 0;
+        position: relative;
+        border: 1px solid var(--line);
+        border-radius: 20px;
+        background: var(--paper);
+        padding: 14px 6px 12px;
+        text-align: center;
+        cursor: pointer;
+        user-select: none;
+        transition:
+          transform 0.3s,
+          background 0.3s,
+          border-color 0.3s,
+          box-shadow 0.3s;
+        animation: rise 0.5s ease both;
+        animation-delay: calc(var(--i) * 50ms);
+      }
+
+      .tile:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow);
+        border-color: var(--rose);
+      }
+      .tile.on {
+        background: var(--rose-soft);
+        border-color: var(--rose-deep);
+        box-shadow: var(--shadow);
+      }
+
+      .tile .t-ico {
+        width: 48px;
+        height: 48px;
+        margin: 0 auto 8px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        font-size: 24px;
+        background: linear-gradient(135deg, var(--rose-soft), var(--peach));
+        transition:
+          transform 0.4s,
+          background 0.3s;
+      }
+
+      .tile:hover .t-ico {
+        transform: rotate(-8deg) scale(1.08);
+      }
+      .tile.on .t-ico {
+        background: #fff;
+      }
+      .tile .t-name {
+        font-family: var(--serif);
+        font-size: 18px;
+        font-weight: 600;
+        line-height: 1.15;
+        overflow-wrap: anywhere;
+        hyphens: auto;
+      }
+      .tile .t-desc {
+        font-size: 13px;
+        color: var(--muted);
+        margin-top: 3px;
+      }
+
+      .tick {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        border: 1.5px solid var(--rose);
+        display: grid;
+        place-items: center;
+        background: var(--paper);
+        transition:
+          background 0.25s,
+          transform 0.25s;
+      }
+
+      .tick svg {
+        width: 13px;
+        height: 13px;
+        stroke: #fff;
+        stroke-width: 2.4;
+        fill: none;
+        stroke-dasharray: 20;
+        stroke-dashoffset: 20;
+        transition: stroke-dashoffset 0.35s ease;
+      }
+      .tile.on .tick {
+        background: var(--rose-deep);
+        border-color: var(--rose-deep);
+        transform: scale(1.1);
+      }
+      .tile.on .tick svg {
+        stroke-dashoffset: 0;
+      }
+
+      .wish {
+        overflow: hidden;
+        max-height: 0;
+        opacity: 0;
+        transition:
+          max-height 0.5s ease,
+          opacity 0.4s,
+          margin 0.4s;
+        margin-top: 0;
+      }
+      .wish.show {
+        max-height: 220px;
+        opacity: 1;
+        margin-top: 18px;
+      }
+      .wish label {
+        display: block;
+        font-family: var(--serif);
+        font-style: italic;
+        font-size: 19px;
+        color: var(--muted);
+        margin: 0 6px 8px;
+      }
+
+      .wish textarea {
+        min-height: 110px;
+        resize: vertical;
+      }
+
+      .wish textarea,
+      .wish input {
+        width: 100%;
+        font: inherit;
+        font-size: 16px;
+        color: var(--ink);
+        background: #fffaf8;
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        padding: 14px 16px;
+        outline: none;
+        transition:
+          border-color 0.3s,
+          box-shadow 0.3s;
+      }
+
+      .wish textarea::placeholder,
+      .wish input::placeholder {
+        color: #c9b8b5;
+      }
+      .wish textarea:focus,
+      .wish input:focus {
+        border-color: var(--rose);
+        box-shadow: 0 0 0 4px var(--rose-soft);
+      }
+
+      .sum {
+        display: grid;
+        gap: 14px;
+        padding: 8px 4px;
+      }
+      .sum-block {
+        border-radius: 18px;
+        background: var(--rose-soft);
+        padding: 16px 18px;
+        animation: rise 0.5s ease both;
+        animation-delay: calc(var(--i) * 80ms);
+        cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
+      }
+      .sum-block.miss {
+        background: transparent;
+        border: 1px dashed var(--rose);
+      }
+      .sum-block h4 {
+        font-family: var(--serif);
+        font-weight: 600;
+        font-size: 22px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 8px;
+      }
+      .sum-block ul {
+        list-style: none;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px 8px;
+      }
+      .sum-block li {
+        font-size: 14px;
+        background: var(--paper);
+        border-radius: 999px;
+        padding: 5px 12px;
+        display: flex;
+        gap: 6px;
+      }
+      .sum-block .none {
+        color: var(--muted);
+        font-style: italic;
+        font-family: var(--serif);
+        font-size: 18px;
+      }
+      .sum-block .quote {
+        margin-top: 10px;
+        padding-left: 12px;
+        border-left: 2px solid var(--rose);
+        font-family: var(--serif);
+        font-style: italic;
+        font-size: 18px;
+        white-space: pre-wrap;
+      }
+      .sum-block .quote small {
+        display: block;
+        font-family: var(--sans);
+        font-style: normal;
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .sum-block .edit {
+        margin-left: auto;
+        flex: none;
+        font-size: 18px;
+        line-height: 1;
+        opacity: 0.7;
+        transition:
+          transform 0.25s,
+          opacity 0.25s;
+      }
+      .sum-block:hover .edit {
+        opacity: 1;
+        transform: rotate(-12deg) scale(1.15);
+      }
+
+      .foot {
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding-top: 16px;
+        border-top: 1px dotted var(--line);
+      }
+      .foot .hint {
+        flex: 1;
+        font-family: var(--serif);
+        font-size: 15px;
+        color: var(--muted);
+        line-height: 1.2;
+        text-align: center;
+      }
+
+      button,
+      .tile {
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      .btn {
+        font: inherit;
+        font-size: 14px;
+        letter-spacing: 0.06em;
+        border: none;
+        cursor: pointer;
+        border-radius: 999px;
+        padding: 0 18px;
+        min-height: 44px;
+        color: #fff;
+        background: linear-gradient(135deg, var(--rose), var(--rose-deep));
+        transition:
+          transform 0.25s,
+          box-shadow 0.25s;
+      }
+
+      .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(217, 132, 151, 0.4);
+      }
+      .btn:disabled,
+      .btn:disabled:hover {
+        opacity: 0.45;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+      }
+      .btn.ghost {
+        background: transparent;
+        color: var(--rose-deep);
+        border: 1px solid var(--rose);
+      }
+      .btn.ghost:hover {
+        box-shadow: none;
+        background: var(--rose-soft);
+      }
+      .btn[hidden] {
+        display: none;
+      }
+
+      .done {
+        text-align: center;
+        padding: 70px 10px;
+        animation: rise 0.6s ease both;
+      }
+      .done .big {
+        font-size: 64px;
+        animation: pop 0.8s ease;
+      }
+      .done h3 {
+        font-family: var(--script);
+        font-weight: 400;
+        font-size: 56px;
+        color: var(--rose-deep);
+      }
+      .done p {
+        font-family: var(--serif);
+        font-style: italic;
+        font-size: 22px;
+        color: var(--muted);
+      }
+
+      @keyframes pop {
+        0% {
+          transform: scale(0.6);
+        }
+        40% {
+          transform: scale(1.3);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+
+      .confetti {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        font-size: 22px;
+        pointer-events: none;
+        z-index: 40;
+        animation: burst 1.6s ease-out forwards;
+      }
+
+      @keyframes burst {
+        to {
+          transform: translate(var(--x), var(--y)) rotate(var(--r));
+          opacity: 0;
+        }
+      }
+
+      @media (min-width: 561px) {
+        :root {
+          --gap: 12px;
+          --max: 3;
+        }
+        .hero {
+          padding: 44px 0 22px;
+        }
+        .head {
+          padding: 20px 0 6px;
+        }
+        .stage {
+          min-height: 300px;
+        }
+        .tile {
+          padding: 20px 8px 16px;
+        }
+        .tile .t-ico {
+          margin-bottom: 10px;
+        }
+        .sheet {
+          padding: 26px 26px 22px;
+        }
+        .step {
+          font-size: 13px;
+          padding: 8px 10px 12px;
+        }
+        .step .s-ico {
+          width: 44px;
+          height: 44px;
+          font-size: 20px;
+        }
+        .head h2 {
+          font-size: 44px;
+        }
+        .tile .t-name {
+          font-size: 22px;
+        }
+        .tile .t-ico {
+          width: 64px;
+          height: 64px;
+          font-size: 30px;
+        }
+        .foot {
+          gap: 12px;
+        }
+        .foot .hint {
+          font-size: 18px;
+        }
+        .btn {
+          padding: 0 24px;
+          min-height: 46px;
+        }
+      }
+
+      @media (min-width: 801px) {
+        :root {
+          --max: 4;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation: none !important;
+          transition: none !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="petals" id="petals"></div>
+
+    <header class="hero">
+      <div class="eyebrow">специально для тебя</div>
+      <h1>Куда поедем?</h1>
+      <div class="flower">🌸</div>
+    </header>
+
+    <main class="sheet" id="sheet">
+      <nav class="steps" id="steps"></nav>
+      <div class="head" id="head"></div>
+      <nav class="groups" id="groups"></nav>
+      <div class="stage"><div class="panel" id="panel"></div></div>
+      <div class="foot">
+        <button class="btn ghost" id="back">Назад</button>
+        <div class="hint" id="hint"></div>
+        <button class="btn" id="next">Дальше</button>
+        <button class="btn" id="send" hidden>Отправить</button>
+      </div>
+    </main>
+
+    <script>
+      const API = {
+        configUrl: null,
+        submitUrl: "https://onesim.shop/trip/",
+      };
+
+      const MOCK_CONFIG = {
+        sections: [
+          {
+            id: "where",
+            icon: "🗺️",
+            label: "Куда",
+            title: "Куда поедем?",
+            subtitle: "Твои места или по настроению",
+            mode: "single",
+            exclusive: true,
+            groups: [
+              {
+                id: "cities",
+                icon: "🏙️",
+                label: "Твои места",
+                mode: "single",
+                cols: 3,
+                items: [
+                  {
+                    id: "france",
+                    icon: "🥐",
+                    title: "Франция",
+                    desc: "Европа",
+                  },
+                  {
+                    id: "portugal",
+                    icon: "🚋",
+                    title: "Португалия",
+                    desc: "Европа",
+                  },
+                  {
+                    id: "greece",
+                    icon: "🏺",
+                    title: "Греция",
+                    desc: "Европа",
+                  },
+                  {
+                    id: "germany",
+                    icon: "🥨",
+                    title: "Германия",
+                    desc: "Европа",
+                  },
+                  {
+                    id: "south-africa",
+                    icon: "🦁",
+                    title: "ЮАР",
+                    desc: "Африка",
+                  },
+                  {
+                    id: "tanzania",
+                    icon: "🐘",
+                    title: "Танзания",
+                    desc: "Африка",
+                  },
+                  {
+                    id: "socotra",
+                    icon: "🌳",
+                    title: "Сокотра",
+                    desc: "Остров, Йемен",
+                  },
+                  {
+                    id: "indonesia",
+                    icon: "🌺",
+                    title: "Индонезия",
+                    desc: "Азия",
+                  },
+                ],
+              },
+              {
+                id: "mood",
+                icon: "✨",
+                label: "Другое",
+                mode: "multi",
+                items: [
+                  { id: "warm", icon: "☀️", title: "Тепло" },
+                  { id: "mountains", icon: "🏔️", title: "Горы" },
+                  { id: "sea", icon: "🌊", title: "Море" },
+                  { id: "city", icon: "🌆", title: "Большой город" },
+                  { id: "nature", icon: "🌲", title: "Природа" },
+                  { id: "island", icon: "🏝️", title: "Остров" },
+                  { id: "romance", icon: "💞", title: "Романтика" },
+                ],
+                field: {
+                  multiline: false,
+                  summary: "Своё место",
+                  label: "Своя страна или город",
+                  placeholder: "Например: Япония или Киото",
+                },
+              },
+            ],
+          },
+          {
+            id: "stay",
+            icon: "🛏️",
+            label: "Жильё",
+            title: "Где остановимся?",
+            subtitle: "Выбери один вариант",
+            mode: "single",
+            items: [
+              { id: "hotel", icon: "🛎️", title: "Отель" },
+              { id: "flat", icon: "🏢", title: "Квартира" },
+              { id: "rooms", icon: "🔑", title: "Отдельные номера" },
+            ],
+          },
+          {
+            id: "fun",
+            icon: "🎀",
+            label: "Развлечения",
+            title: "Чем займёмся?",
+            subtitle: "Отметь всё, что нравится",
+            mode: "multi",
+            items: [
+              { id: "cafe", icon: "🥂", title: "Кафе и рестораны" },
+              { id: "cinema", icon: "🎬", title: "Кино" },
+              { id: "sport", icon: "🏄‍♀️", title: "Спорт" },
+              { id: "culture", icon: "🏛️", title: "Культура" },
+              { id: "spa", icon: "🧖‍♀️", title: "Спа" },
+              { id: "music", icon: "🎷", title: "Музыка" },
+              { id: "together", icon: "💞", title: "Что-то вместе" },
+            ],
+            field: {
+              multiline: false,
+              summary: "Своё",
+              label: "Можешь добавить своё",
+              placeholder: "Например: теннис",
+            },
+          },
+          {
+            id: "extras",
+            icon: "🎁",
+            label: "Опции",
+            title: "Как мне подготовиться?",
+            subtitle: "Что-то необычное или ты подскажешь",
+            mode: "single",
+            items: [
+              {
+                id: "surprise",
+                icon: "🎁",
+                title: "Сюрприз",
+                desc: "Что-то необычное",
+              },
+              {
+                id: "hint",
+                icon: "💭",
+                title: "Подсказка",
+                desc: "Расскажу, чего хочется",
+              },
+            ],
+            field: {
+              showWhen: "hint",
+              label: "Напиши пожелания",
+              placeholder: "Например: хочу тишину, море и ужин на закате",
+            },
+          },
+        ],
+      };
+
+      const SUMMARY = {
+        id: "summary",
+        icon: "💌",
+        label: "Итог",
+        title: "Твой выбор",
+        subtitle: "Всё, что ты отметила",
+      };
+
+      const state = {
+        sections: [],
+        step: 0,
+        group: {},
+        picks: {},
+        notes: {},
+        busy: false,
+      };
+
+      const $ = (id) => document.getElementById(id);
+
+      const esc = (v) =>
+        String(v ?? "").replace(
+          /[&<>"']/g,
+          (c) =>
+            ({
+              "&": "&amp;",
+              "<": "&lt;",
+              ">": "&gt;",
+              '"': "&quot;",
+              "'": "&#39;",
+            })[c],
+        );
+
+      const CHECK =
+        '<svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+
+      async function loadConfig() {
+        if (!API.configUrl) return MOCK_CONFIG;
+        try {
+          const res = await fetch(API.configUrl);
+          if (!res.ok) throw new Error(res.status);
+          return await res.json();
+        } catch (e) {
+          return MOCK_CONFIG;
+        }
+      }
+
+      function petals() {
+        const box = $("petals");
+        for (let i = 0; i < 14; i++) {
+          const p = document.createElement("span");
+          p.className = "petal";
+          p.textContent = "🌸";
+          p.style.fontSize = 12 + Math.random() * 14 + "px";
+          p.style.left = Math.random() * 100 + "%";
+          p.style.setProperty("--drift", Math.random() * 160 - 80 + "px");
+          p.style.animationDuration = 14 + Math.random() * 16 + "s";
+          p.style.animationDelay = -Math.random() * 20 + "s";
+          box.appendChild(p);
+        }
+      }
+
+      const allSteps = () => [...state.sections, SUMMARY];
+      const current = () => allSteps()[state.step];
+      const isSummary = () => state.step === state.sections.length;
+      const picksOf = (sid) =>
+        state.picks[sid] || (state.picks[sid] = new Set());
+      const noteOf = (f) => (state.notes[f.key] || "").trim();
+      const fieldVisible = (s, f) =>
+        !f.showWhen || picksOf(s.id).has(f.showWhen);
+      const fieldFor = (s, g) => g.field || s.field;
+      const fieldsOf = (s) =>
+        [s.field, ...s.groups.map((g) => g.field)].filter(Boolean);
+      const activeNotes = (s) =>
+        fieldsOf(s).filter((f) => fieldVisible(s, f) && noteOf(f));
+      const countOf = (s) =>
+        picksOf(s.id).size +
+        fieldsOf(s).filter((f) => !f.showWhen && noteOf(f)).length;
+      const isDone = (s) =>
+        countOf(s) > 0 &&
+        !(
+          s.field &&
+          s.field.showWhen &&
+          picksOf(s.id).has(s.field.showWhen) &&
+          !noteOf(s.field)
+        );
+      const missing = () => state.sections.filter((s) => !isDone(s));
+      const modeOf = (s, g) => g.mode || s.mode;
+
+      function renderSteps() {
+        $("steps").innerHTML = allSteps()
+          .map((s, i) => {
+            const n = s.id === "summary" ? 0 : countOf(s);
+            return `<button class="step${i === state.step ? " active" : ""}${n ? " has" : ""}" data-step="${i}">
+        <span class="s-ico">${esc(s.icon)}<span class="s-count">${n}</span></span>${esc(s.label)}
+      </button>`;
+          })
+          .join("");
+      }
+
+      function updateSteps() {
+        const steps = document.querySelectorAll(".step");
+        allSteps().forEach((s, i) => {
+          const n = s.id === "summary" ? 0 : countOf(s);
+          steps[i].classList.toggle("active", i === state.step);
+          steps[i].classList.toggle("has", n > 0);
+          steps[i].querySelector(".s-count").textContent = n;
+        });
+      }
+
+      function renderHead() {
+        const s = current();
+        $("head").innerHTML =
+          `<h2>${esc(s.title)}</h2><p>${esc(s.subtitle)}</p>`;
+      }
+
+      function renderGroups() {
+        const box = $("groups");
+        if (isSummary()) {
+          box.innerHTML = "";
+          box.classList.add("single-group");
+          return;
+        }
+        const s = current();
+        const active = state.group[s.id];
+        const set = picksOf(s.id);
+        box.classList.toggle("single-group", s.groups.length < 2);
+        box.innerHTML = s.groups
+          .map((g) => {
+            const has =
+              g.items.some((i) => set.has(i.id)) ||
+              (g.field && !!noteOf(g.field));
+            return `<button class="chip${g.id === active ? " active" : ""}${has ? " has" : ""}" data-group="${esc(g.id)}">
+        <span>${esc(g.icon)}</span>${esc(g.label)}<span class="dot"></span>
+      </button>`;
+          })
+          .join("");
+      }
+
+      function renderPanel() {
+        const panel = $("panel");
+        if (isSummary()) {
+          panel.innerHTML = renderSummary();
+          return;
+        }
+        const s = current();
+        const g = s.groups.find((x) => x.id === state.group[s.id]);
+        const set = picksOf(s.id);
+        const rows = g.items
+          .map(
+            (it, i) => `
+    <div class="tile${set.has(it.id) ? " on" : ""}" data-item="${esc(it.id)}" style="--i:${i};--n:${g.items.length}${g.cols ? `;--cap:${Number(g.cols)}` : ""}">
+      <span class="tick">${CHECK}</span>
+      <div class="t-ico">${esc(it.icon)}</div>
+      <div class="t-name">${esc(it.title)}</div>
+      ${it.desc ? `<div class="t-desc">${esc(it.desc)}</div>` : ""}
+    </div>`,
+          )
+          .join("");
+        const f = fieldFor(s, g);
+        const value = f ? esc(state.notes[f.key] || "") : "";
+        const control =
+          f && f.multiline === false
+            ? `<input type="text" id="wishInput" data-key="${esc(f.key)}" maxlength="80" placeholder="${esc(f.placeholder)}" value="${value}">`
+            : f
+              ? `<textarea id="wishInput" data-key="${esc(f.key)}" placeholder="${esc(f.placeholder)}">${value}</textarea>`
+              : "";
+        const field = f
+          ? `<div class="wish${fieldVisible(s, f) ? " show" : ""}" id="wish">
+        <label for="wishInput">${esc(f.label)}</label>
+        ${control}
+      </div>`
+          : "";
+        panel.innerHTML = `<div class="tiles">${rows}</div>${field}`;
+      }
+
+      function renderSummary() {
+        return `<div class="sum">${state.sections
+          .map((s, i) => {
+            const set = picksOf(s.id);
+            const rows = s.groups.flatMap((g) =>
+              g.items.filter((it) => set.has(it.id)),
+            );
+            const notes = activeNotes(s);
+            const body = rows.length
+              ? `<ul>${rows.map((it) => `<li><span>${esc(it.icon)}</span><span>${esc(it.title)}</span></li>`).join("")}</ul>`
+              : notes.length
+                ? ""
+                : `<div class="none">Пока ничего не выбрано</div>`;
+            const done = isDone(s);
+            const note = notes
+              .map(
+                (f) =>
+                  `<div class="quote">${f.summary ? `<small>${esc(f.summary)}</small>` : ""}${esc(noteOf(f))}</div>`,
+              )
+              .join("");
+            const todo =
+              !done && rows.length
+                ? `<div class="none">Допиши пожелания</div>`
+                : "";
+            return `<div class="sum-block${done ? "" : " miss"}" data-step="${i}" role="button" tabindex="0" aria-label="Изменить: ${esc(s.label)}" style="--i:${i}">
+        <h4>${esc(s.icon)} ${esc(s.label)}<span class="edit" aria-hidden="true">✏️</span></h4>
+        ${body}${note}${todo}
+      </div>`;
+          })
+          .join("")}</div>`;
+      }
+
+      function renderFoot() {
+        const last = isSummary();
+        $("back").style.visibility = state.step === 0 ? "hidden" : "visible";
+        $("next").hidden = last;
+        $("send").hidden = !last;
+        const miss = last ? missing() : [];
+        $("send").disabled = miss.length > 0;
+        $("hint").textContent = miss.length
+          ? "Не заполнено: " + miss.map((s) => s.label).join(", ")
+          : "";
+      }
+
+      function renderAll() {
+        renderSteps();
+        renderHead();
+        renderGroups();
+        renderPanel();
+        renderFoot();
+      }
+
+      function swap(fn, dir) {
+        if (state.busy) return;
+        state.busy = true;
+        const panel = $("panel");
+        panel.style.setProperty("--dx", -dir * 28 + "px");
+        panel.style.setProperty("--ex", dir * 28 + "px");
+        panel.classList.remove("enter");
+        panel.classList.add("out");
+        setTimeout(() => {
+          fn();
+          panel.classList.remove("out");
+          void panel.offsetWidth;
+          panel.classList.add("enter");
+          state.busy = false;
+        }, 180);
+      }
+
+      function goStep(i) {
+        if (i === state.step || i < 0 || i > state.sections.length) return;
+        const dir = i > state.step ? 1 : -1;
+        swap(() => {
+          state.step = i;
+          renderAll();
+        }, dir);
+      }
+
+      function goGroup(id) {
+        const s = current();
+        const prev = state.group[s.id];
+        if (id === prev) return;
+        const ids = s.groups.map((g) => g.id);
+        const dir = ids.indexOf(id) > ids.indexOf(prev) ? 1 : -1;
+        swap(() => {
+          state.group[s.id] = id;
+          renderGroups();
+          renderPanel();
+        }, dir);
+      }
+
+      function toggleItem(itemId, el) {
+        const s = current();
+        const g = s.groups.find((x) => x.id === state.group[s.id]);
+        const set = picksOf(s.id);
+        const had = set.has(itemId);
+        if (s.exclusive) {
+          s.groups.forEach((o) => {
+            if (o === g) return;
+            o.items.forEach((i) => set.delete(i.id));
+            if (o.field) delete state.notes[o.field.key];
+          });
+        }
+        if (modeOf(s, g) === "single") {
+          g.items.forEach((i) => set.delete(i.id));
+          document
+            .querySelectorAll("[data-item]")
+            .forEach((n) => n.classList.remove("on"));
+          if (!had) set.add(itemId);
+        } else if (had) {
+          set.delete(itemId);
+        } else {
+          set.add(itemId);
+        }
+        el.classList.toggle("on", set.has(itemId));
+        const f = fieldFor(s, g);
+        const wish = $("wish");
+        if (f && wish && f.showWhen) {
+          const show = fieldVisible(s, f);
+          wish.classList.toggle("show", show);
+          if (show)
+            setTimeout(() => {
+              const input = $("wishInput");
+              if (input) input.focus({ preventScroll: true });
+            }, 350);
+        }
+        updateSteps();
+        renderGroups();
+        renderFoot();
+      }
+
+      function confetti() {
+        const set = ["💗", "🌸", "✨", "🌷", "💌", "🍓"];
+        for (let i = 0; i < 26; i++) {
+          const c = document.createElement("span");
+          c.className = "confetti";
+          c.textContent = set[i % set.length];
+          c.style.setProperty("--x", Math.random() * 520 - 260 + "px");
+          c.style.setProperty("--y", Math.random() * 520 - 300 + "px");
+          c.style.setProperty("--r", Math.random() * 360 - 180 + "deg");
+          document.body.appendChild(c);
+          setTimeout(() => c.remove(), 1700);
+        }
+      }
+
+      async function submit() {
+        if (missing().length) return;
+        const selection = {};
+        const wishes = {};
+        state.sections.forEach((s) => {
+          selection[s.id] = [...picksOf(s.id)];
+          activeNotes(s).forEach((f) => {
+            wishes[f.key] = noteOf(f);
+          });
+        });
+        if (API.submitUrl) {
+          const btn = $("send");
+          btn.disabled = true;
+          try {
+            const res = await fetch(API.submitUrl, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ selection, wishes }),
+            });
+            if (!res.ok) throw new Error(res.status);
+          } catch (e) {
+            console.error(e);
+            btn.disabled = false;
+            $("hint").textContent = "Не получилось отправить, попробуй ещё раз";
+            return;
+          }
+        } else {
+          console.log("selection", selection, wishes);
+        }
+        $("steps").style.display = "none";
+        $("head").style.display = "none";
+        $("groups").style.display = "none";
+        document.querySelector(".foot").style.display = "none";
+        $("panel").innerHTML =
+          `<div class="done"><div class="big">💌</div><h3>Отправлено</h3><p>Скоро всё организую</p></div>`;
+        confetti();
+      }
+
+      document.addEventListener("click", (e) => {
+        const step = e.target.closest("[data-step]");
+        if (step) return goStep(Number(step.dataset.step));
+        const group = e.target.closest("[data-group]");
+        if (group) return goGroup(group.dataset.group);
+        const item = e.target.closest("[data-item]");
+        if (item && !state.busy) toggleItem(item.dataset.item, item);
+      });
+
+      document.addEventListener("keydown", (e) => {
+        if (e.key !== "Enter" && e.key !== " ") return;
+        const block = e.target.closest(".sum-block");
+        if (!block) return;
+        e.preventDefault();
+        goStep(Number(block.dataset.step));
+      });
+
+      document.addEventListener("input", (e) => {
+        const key = e.target.dataset.key;
+        if (!key) return;
+        state.notes[key] = e.target.value;
+        const s = current();
+        if (s.exclusive && e.target.value.trim()) {
+          const g = s.groups.find((x) => x.id === state.group[s.id]);
+          s.groups.forEach(
+            (o) =>
+              o !== g && o.items.forEach((i) => picksOf(s.id).delete(i.id)),
+          );
+        }
+        updateSteps();
+        renderGroups();
+        renderFoot();
+      });
+
+      $("next").addEventListener("click", () => goStep(state.step + 1));
+      $("back").addEventListener("click", () => goStep(state.step - 1));
+      $("send").addEventListener("click", submit);
+
+      (async function init() {
+        petals();
+        const cfg = await loadConfig();
+        state.sections = cfg.sections.map((s) =>
+          s.groups
+            ? s
+            : {
+                ...s,
+                groups: [{ id: "all", icon: "", label: "", items: s.items }],
+              },
+        );
+        state.sections.forEach((s) => {
+          if (s.field) s.field.key = s.id;
+          s.groups.forEach((g) => {
+            if (g.field) g.field.key = s.id + "." + g.id;
+          });
+          state.group[s.id] = s.groups[0].id;
+          state.picks[s.id] = new Set();
+        });
+        renderAll();
+      })();
+    </script>
+  </body>
+</html>
